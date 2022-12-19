@@ -3,7 +3,6 @@ package com.pk.flink.scenario01;
 import com.alibaba.fastjson.JSON;
 import com.pk.flink.utils.DateUtils;
 import org.apache.flink.api.common.typeinfo.Types;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -13,8 +12,6 @@ import org.apache.flink.streaming.connectors.redis.common.config.FlinkJedisPoolC
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommand;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommandDescription;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisMapper;
-
-import java.util.List;
 
 public class FlinkTopAnalysisApp {
     public static void main(String[] args) throws Exception {
