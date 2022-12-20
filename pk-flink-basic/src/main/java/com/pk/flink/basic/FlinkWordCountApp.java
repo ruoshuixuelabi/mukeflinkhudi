@@ -14,6 +14,7 @@ public class FlinkWordCountApp {
     public static void main(String[] args) throws Exception {
         // 统一使用StreamExecutionEnvironment这个执行上下文环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        //这里可以修改模式 使用批处理还是流处理
         env.setRuntimeMode(RuntimeExecutionMode.AUTOMATIC);
         DataStreamSource<String> source = env.readTextFile("data/wc.data");
         source.flatMap((String value, Collector<Tuple2<String, Integer>> out) -> {

@@ -13,17 +13,14 @@ import org.apache.flink.util.Collector;
  * 使用Flink进行批处理，并统计wc
  */
 public class BatchWordCountApp {
-
     public static void main(String[] args) throws Exception {
         // step0: Spark中有上下文，Flink中也有上下文，MR中也有
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-
         // step1: 读取文件内容  ==> 一行一行的字符串而已
         DataSource<String> source = env.readTextFile("data/wc.data");
-
         // step2: 每一行的内容按照指定的分隔符进行拆分  1:N
         source.flatMap(new PKFlatMapFunction())
-                .map(new MapFunction<String, Tuple2<String,Integer>>() {
+                .map(new MapFunction<String, Tuple2<String, Integer>>() {
                     @Override
                     public Tuple2<String, Integer> map(String value) throws Exception {
                         return Tuple2.of(value, 1);
