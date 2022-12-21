@@ -15,6 +15,7 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-clients</artifactId>
         </dependency>
+        <!-- 本地想要运行Flink的UI需要引入该依赖-->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-runtime-web</artifactId>

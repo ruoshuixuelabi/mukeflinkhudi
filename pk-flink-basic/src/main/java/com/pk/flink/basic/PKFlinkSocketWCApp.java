@@ -14,6 +14,8 @@ import org.apache.flink.util.Collector;
 public class PKFlinkSocketWCApp {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+//        Configuration configuration=new Configuration();
+//        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(configuration);
         // 通过参数传递进来Flink引用程序所需要的参数
         ParameterTool tool = ParameterTool.fromArgs(args);
         String host = tool.get("host");
