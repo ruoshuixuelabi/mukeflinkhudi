@@ -15,18 +15,15 @@ import java.sql.ResultSet;
  * RichSourceFunction: Rich  +   SourceFunction
  * Rich: 包含了生命周期方法  open  close
  * SourceFunction：单
- *
+ * <p>
  * 自定义二次开发：按照框架(Flink/Spark/....)所提供的接口，去实现自己的业务逻辑即可
  * 自定义Source
  * 自定义Sink
- *
- *
+ * <p>
+ * <p>
  * 扩展：对于Spark SQL的外部数据源熟悉吗？ 按照Spark所提供的接口，自己实现业务逻辑
- *
  */
 public class PKMySQLSource extends RichSourceFunction<Student> {
-
-
     Connection connection;
     PreparedStatement pstmt;
 
@@ -46,7 +43,6 @@ public class PKMySQLSource extends RichSourceFunction<Student> {
     public void close() throws Exception {
         MySQLUtils.close(pstmt);
         MySQLUtils.close(connection);
-
     }
 
     /**
@@ -66,6 +62,5 @@ public class PKMySQLSource extends RichSourceFunction<Student> {
 
     @Override
     public void cancel() {
-
     }
 }

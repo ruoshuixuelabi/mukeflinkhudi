@@ -11,7 +11,7 @@ public class MySQLUtils {
     }
 
     public static void close(AutoCloseable closeable) {
-        if(null != closeable) {
+        if (null != closeable) {
             try {
                 closeable.close(); // null.close
             } catch (Exception e) {

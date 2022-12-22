@@ -14,19 +14,14 @@ import java.time.Duration;
 public class WMApp01 {
 
     public static void main(String[] args) throws Exception {
-
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-
-
         // 事件时间,domain,traffic
         DataStreamSource<String> source = env.socketTextStream("hadoop000", 9527);
-
         WatermarkStrategy<String> watermarkStrategy = WatermarkStrategy.<String>forBoundedOutOfOrderness(Duration.ofMillis(0))
                 .withTimestampAssigner((event, timestamp) -> Long.parseLong(event.split(",")[0]));
-
         source.assignTimestampsAndWatermarks(watermarkStrategy)
-             .map(new MapFunction<String, Access>() {
+                .map(new MapFunction<String, Access>() {
                     @Override
                     public Access map(String value) throws Exception {
                         String[] splits = value.split(",");
@@ -38,19 +33,13 @@ public class WMApp01 {
                     }
                 }).setParallelism(2)
                 .process(new ProcessFunction<Access, Access>() {
-            @Override
-            public void processElement(Access value, Context ctx, Collector<Access> out) throws Exception {
-
-                long watermark = ctx.timerService().currentWatermark();
-                System.out.println("该数据是:" + value + " , WM是:" + watermark);
-
-                out.collect(value);
-            }
-        }).setParallelism(1).print();
-
-
+                    @Override
+                    public void processElement(Access value, Context ctx, Collector<Access> out) throws Exception {
+                        long watermark = ctx.timerService().currentWatermark();
+                        System.out.println("该数据是:" + value + " , WM是:" + watermark);
+                        out.collect(value);
+                    }
+                }).setParallelism(1).print();
         env.execute("WMApp01");
     }
-
-
 }
