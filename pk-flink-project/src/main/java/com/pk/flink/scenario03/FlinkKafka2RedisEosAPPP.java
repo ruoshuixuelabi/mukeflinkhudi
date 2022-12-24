@@ -15,41 +15,33 @@ import org.apache.flink.util.Collector;
 
 /**
  * 功能需求：使用Flink对接Kafka的数据源，完成词频统计，完成精准一次语义
- *
  */
 public class FlinkKafka2RedisEosAPPP {
-
     public static void main(String[] args) throws Exception {
-
         DataStream<String> stream = FlinkUtils.createStream(args, SimpleStringSchema.class);
         // TODO... 完成业务逻辑开发
-
         SingleOutputStreamOperator<Tuple2<String, Integer>> res = stream.flatMap(new FlatMapFunction<String, String>() {
-            @Override
-            public void flatMap(String value, Collector<String> out) throws Exception {
-                String[] splits = value.split(",");
-                for (String split : splits) {
-                    out.collect(split.trim());
-                }
-            }
-        }).map(new MapFunction<String, Tuple2<String, Integer>>() {
-            @Override
-            public Tuple2<String, Integer> map(String value) throws Exception {
-                return Tuple2.of(value, 1);
-            }
-        }).keyBy(x -> x.f0)
+                    @Override
+                    public void flatMap(String value, Collector<String> out) throws Exception {
+                        String[] splits = value.split(",");
+                        for (String split : splits) {
+                            out.collect(split.trim());
+                        }
+                    }
+                }).map(new MapFunction<String, Tuple2<String, Integer>>() {
+                    @Override
+                    public Tuple2<String, Integer> map(String value) throws Exception {
+                        return Tuple2.of(value, 1);
+                    }
+                }).keyBy(x -> x.f0)
                 .sum(1);
-
         res.print();
-
         FlinkJedisPoolConfig conf = new FlinkJedisPoolConfig.Builder()
-        .setHost("hadoop000")  // 指向部署redis的hostname或者是ip
-        .setPort(16379)  // 指向的是redis的端口  默认是6379，默认端口在云主机上容易被挖矿
-        .setDatabase(8)  // 指向结果写入到redis中的第几个数据库
-        .build();
-
+                .setHost("hadoop000")  // 指向部署redis的hostname或者是ip
+                .setPort(16379)  // 指向的是redis的端口  默认是6379，默认端口在云主机上容易被挖矿
+                .setDatabase(8)  // 指向结果写入到redis中的第几个数据库
+                .build();
         res.addSink(new RedisSink<Tuple2<String, Integer>>(conf, new RedisExampleMapper()));
-
         FlinkUtils.environment.execute("EOSApp01");
     }
 
@@ -71,5 +63,4 @@ public class FlinkKafka2RedisEosAPPP {
             return data.f1 + "";
         }
     }
-
 }
