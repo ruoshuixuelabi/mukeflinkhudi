@@ -3,11 +3,15 @@ package com.pk.flink.sink;
 import com.pk.flink.bean.Access;
 import com.pk.flink.function.AccessConvertFunction;
 import com.pk.flink.function.PKConsoleSinkFunction;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringEncoder;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.MemorySize;
+import org.apache.flink.connector.file.sink.FileSink;
+import org.apache.flink.connector.file.src.FileSource;
+import org.apache.flink.connector.file.src.reader.TextLineInputFormat;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
 import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
 import org.apache.flink.connector.jdbc.JdbcSink;
@@ -33,16 +37,14 @@ import java.time.Duration;
 public class SinkApp {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
 //        env.enableCheckpointing(3000);
-//
 //        DataStreamSource<String> source = env.readTextFile("data/access.log");
+//        FileSource<String> fileSource = FileSource.forRecordStreamFormat(new TextLineInputFormat(), new Path("data/access.log")).build();
+//        DataStreamSource<String> source = env.fromSource(fileSource, WatermarkStrategy.noWatermarks(), "file-source");
 //        SingleOutputStreamOperator<Access> stream = source.map(new AccessConvertFunction());
-
         //  num>  如果并行度为1，那么就没有num>开头
-
-        //stream.addSink(new PKConsoleSinkFunction());
-
+//        stream.addSink(new PKConsoleSinkFunction());
+        //新版StreamingFileSink已经废弃，推荐使用 org.apache.flink.connector.file.sink.FileSink
 //        StreamingFileSink<String> fileSink = StreamingFileSink
 //                .forRowFormat(new Path("out"), new SimpleStringEncoder())
 //                .withRollingPolicy(DefaultRollingPolicy.builder() // 构建文本滚动生成的策略
@@ -51,30 +53,34 @@ public class SinkApp {
 //                        .withMaxPartSize(MemorySize.ofMebiBytes(1)) // 按大小滚动
 //                        .build())
 //                .build();
-
-//        stream.map(Access::toString).addSink(fileSink);
-
-
-        /**
+//        FileSink<String> fileSink = FileSink
+//                .forRowFormat(new Path("out"), new SimpleStringEncoder<String>("UTF-8"))
+//                .withRollingPolicy(
+//                        DefaultRollingPolicy.builder() // 构建文本滚动生成的策略
+//                                .withRolloverInterval(Duration.ofMinutes(15)) // 按时间间隔滚动
+//                                .withInactivityInterval(Duration.ofSeconds(5)) // 按不活跃滚动
+//                                .withMaxPartSize(MemorySize.ofMebiBytes(1)) // 按大小滚动
+//                                .build())
+//                .build();
+////        stream.map(Access::toString).addSink(fileSink);
+//        stream.map(Access::toString).sinkTo(fileSink);
+        /*
          * 需求：access的数据，按照domain分组，求每个域名对应的traffic之和，结果写到redis
          */
-        DataStreamSource<String> source = env.readTextFile("data/access.log");
+//        DataStreamSource<String> source = env.readTextFile("data/access.log");
+        FileSource<String> fileSource = FileSource.forRecordStreamFormat(new TextLineInputFormat(), new Path("data/access.log")).build();
+        DataStreamSource<String> source = env.fromSource(fileSource, WatermarkStrategy.noWatermarks(), "file-source");
         SingleOutputStreamOperator<Access> stream = source.map(new AccessConvertFunction());
-//        SingleOutputStreamOperator<Tuple2<String, Double>> resultStream = stream.map(x -> Tuple2.of(x.getDomain(), x.getTraffic()))
-//                .returns(Types.TUPLE(Types.STRING, Types.DOUBLE))
-//                .keyBy(x -> x.f0)
-//                .sum(1);
-
-
-//        FlinkJedisPoolConfig conf = new FlinkJedisPoolConfig.Builder()
-//                .setHost("hadoop000")  // 指向部署redis的hostname或者是ip
-//                .setPort(16379)  // 指向的是redis的端口  默认是6379，默认端口在云主机上容易被挖矿
-//                .setDatabase(6)  // 指向结果写入到redis中的第几个数据库
-//                .build();
-//
-//        resultStream.addSink(new RedisSink<Tuple2<String, Double>>(conf, new RedisExampleMapper()));
-
-
+        SingleOutputStreamOperator<Tuple2<String, Double>> resultStream = stream.map(x -> Tuple2.of(x.getDomain(), x.getTraffic()))
+                .returns(Types.TUPLE(Types.STRING, Types.DOUBLE))
+                .keyBy(x -> x.f0)
+                .sum(1);
+        FlinkJedisPoolConfig conf = new FlinkJedisPoolConfig.Builder()
+                .setHost("hadoop000")  // 指向部署redis的hostname或者是ip
+                .setPort(16379)  // 指向的是redis的端口  默认是6379，默认端口在云主机上容易被挖矿
+                .setDatabase(6)  // 指向结果写入到redis中的第几个数据库
+                .build();
+        resultStream.addSink(new RedisSink<Tuple2<String, Double>>(conf, new RedisExampleMapper()));
 //        SinkFunction<Tuple2<String, Double>> jdbcSink = JdbcSink.sink(
 //                "insert into pk_traffics (domain, traffics) values (?, ?) on duplicate key update traffics=?",
 //                (JdbcStatementBuilder<Tuple2<String, Double>>) (pstmt, tuple) -> {
@@ -96,10 +102,7 @@ public class SinkApp {
 //        );
 //
 //        resultStream.addSink(jdbcSink);
-
-        stream.map(Access::toString).writeToSocket("localhost", 9528, new SimpleStringSchema());
-
-
+//        stream.map(Access::toString).writeToSocket("localhost", 9528, new SimpleStringSchema());
         env.execute("SinkApp"); // 一般是填写Flink应用的名字
     }
 
@@ -108,9 +111,9 @@ public class SinkApp {
         /**
          * 采用的是redis中的hash数据结构
          * pk-traffics
-         *      key1  value1    ==> pk1.com  ....
-         *      key2  value2    ==> pk2.com  ....
-         *      key3  value3    ==> pk3.com  ....
+         * key1  value1    ==> pk1.com  ....
+         * key2  value2    ==> pk2.com  ....
+         * key3  value3    ==> pk3.com  ....
          */
         @Override
         public RedisCommandDescription getCommandDescription() {
