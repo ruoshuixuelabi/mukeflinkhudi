@@ -11,21 +11,16 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
 
-
 /**
  * 关于Flink状态的有效期设置
- *
  */
 public class StateTtlApp {
     public static void main(String[] args) throws Exception {
-
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
         env.enableCheckpointing(5000);
-
         env.socketTextStream("localhost", 9527)
-                .map(x -> x.toLowerCase())
-                .flatMap(new FlatMapFunction<String, Tuple2<String,Long>>() {
+                .map(String::toLowerCase)
+                .flatMap(new FlatMapFunction<String, Tuple2<String, Long>>() {
                     @Override
                     public void flatMap(String value, Collector<Tuple2<String, Long>> out) throws Exception {
                         String[] splits = value.split(",");
@@ -35,22 +30,17 @@ public class StateTtlApp {
                     }
                 }).keyBy(x -> x.f0)
                 // keyby  过期是作用到key上    某些key时间到了过期，某些key时间没到，就不过期
-                .map(new RichMapFunction<Tuple2<String,Long>, Tuple2<String,Long>>() {
-
+                .map(new RichMapFunction<Tuple2<String, Long>, Tuple2<String, Long>>() {
                     private transient ValueState<Long> counter = null;
 
                     @Override
                     public void open(Configuration parameters) throws Exception {
-
                         StateTtlConfig ttlConfig = StateTtlConfig.newBuilder(Time.seconds(10))
                                 .updateTtlOnCreateAndWrite()
                                 .setStateVisibility(StateTtlConfig.StateVisibility.NeverReturnExpired)
                                 .setTtlTimeCharacteristic(StateTtlConfig.TtlTimeCharacteristic.ProcessingTime)
-                                .build()
-                                ;
-
-
-                        ValueStateDescriptor stateDescriptor = new ValueStateDescriptor("state", Long.class);
+                                .build();
+                        ValueStateDescriptor<Long> stateDescriptor = new ValueStateDescriptor<Long>("state", Long.class);
                         stateDescriptor.enableTimeToLive(ttlConfig);
                         counter = getRuntimeContext().getState(stateDescriptor);
                     }
@@ -58,23 +48,15 @@ public class StateTtlApp {
                     @Override
                     public Tuple2<String, Long> map(Tuple2<String, Long> value) throws Exception {
                         Long history = counter.value(); // 获取状态里面的值
-
                         long currentValue = value.f1;
-                        if(null == history) {
+                        if (null == history) {
                             history = 0L;
                         }
-
                         long total = history + currentValue;
-
                         counter.update(total); // 更新状态的值
-
-
                         return Tuple2.of(value.f0, total);
                     }
                 }).print();
-
-
         env.execute("StateTtlApp");
     }
-
 }

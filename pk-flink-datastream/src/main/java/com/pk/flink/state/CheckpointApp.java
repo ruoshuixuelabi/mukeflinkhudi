@@ -11,7 +11,8 @@ public class CheckpointApp {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-        env.enableCheckpointing(5000); // 开启了chk之后，策略是Integer.MAX_VALUE
+        // 开启了chk之后，策略是Integer.MAX_VALUE  基本无限重启
+        env.enableCheckpointing(5000);
 //        RestartStrategies.RestartStrategyConfiguration restartStrategy = RestartStrategies.noRestart();
 //        env.setRestartStrategy(restartStrategy);
         env.setStateBackend(new HashMapStateBackend());
@@ -19,7 +20,7 @@ public class CheckpointApp {
         // 设置 重启最大次数  两次重启之间的延迟间隔
         env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3, 5));
         // 故障越频繁，两次重启之间的间隔就会越长
-        /**
+        /*
          * @param initialBackoff Starting duration between restarts 重启间隔时长的初始值  1s
          * @param maxBackoff The highest possible duration between restarts   重启间隔最大值：60s
          * @param backoffMultiplier Delay multiplier how many times is the delay longer than before  2

@@ -75,12 +75,12 @@ public class SinkApp {
                 .returns(Types.TUPLE(Types.STRING, Types.DOUBLE))
                 .keyBy(x -> x.f0)
                 .sum(1);
-        FlinkJedisPoolConfig conf = new FlinkJedisPoolConfig.Builder()
-                .setHost("hadoop000")  // 指向部署redis的hostname或者是ip
-                .setPort(16379)  // 指向的是redis的端口  默认是6379，默认端口在云主机上容易被挖矿
-                .setDatabase(6)  // 指向结果写入到redis中的第几个数据库
-                .build();
-        resultStream.addSink(new RedisSink<Tuple2<String, Double>>(conf, new RedisExampleMapper()));
+//        FlinkJedisPoolConfig conf = new FlinkJedisPoolConfig.Builder()
+//                .setHost("hadoop000")  // 指向部署redis的hostname或者是ip
+//                .setPort(16379)  // 指向的是redis的端口  默认是6379，默认端口在云主机上容易被挖矿
+//                .setDatabase(6)  // 指向结果写入到redis中的第几个数据库
+//                .build();
+//        resultStream.addSink(new RedisSink<Tuple2<String, Double>>(conf, new RedisExampleMapper()));
 //        SinkFunction<Tuple2<String, Double>> jdbcSink = JdbcSink.sink(
 //                "insert into pk_traffics (domain, traffics) values (?, ?) on duplicate key update traffics=?",
 //                (JdbcStatementBuilder<Tuple2<String, Double>>) (pstmt, tuple) -> {
@@ -100,9 +100,8 @@ public class SinkApp {
 //                        .withPassword("!Ruozedata123")
 //                        .build()
 //        );
-//
 //        resultStream.addSink(jdbcSink);
-//        stream.map(Access::toString).writeToSocket("localhost", 9528, new SimpleStringSchema());
+        stream.map(Access::toString).writeToSocket("localhost", 9528, new SimpleStringSchema());
         env.execute("SinkApp"); // 一般是填写Flink应用的名字
     }
 
