@@ -4,12 +4,9 @@ import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableEnvironment;
 
 public class ConnectorJDBCApp {
-
     public static void main(String[] args) {
-
         EnvironmentSettings settings = EnvironmentSettings.newInstance().build();
         TableEnvironment tableEnv = TableEnvironment.create(settings);
-
         tableEnv.executeSql("CREATE TABLE flink_click_log (\n" +
                 "`user` STRING,\n" +
                 "`time` STRING,\n" +
@@ -21,11 +18,9 @@ public class ConnectorJDBCApp {
                 "'username'='root',\n" +
                 "'password'='123456'\n" +
                 ");");
-
         tableEnv.executeSql("desc flink_click_log").print();
         tableEnv.executeSql("select user, count(1) from flink_click_log group by user").print();
-
-        /**
+        /*
          * Mary | 12:00:00 | ./home      |
          | Bob  | 12:00:00 | ./cart      |
          | Mary | 12:00:05 | ./prod?id=1 |

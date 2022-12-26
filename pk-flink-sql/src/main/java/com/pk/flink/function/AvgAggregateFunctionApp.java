@@ -15,7 +15,6 @@ public class AvgAggregateFunctionApp {
     public static void main(String[] args) throws Exception {
         EnvironmentSettings settings = EnvironmentSettings.newInstance().build();
         TableEnvironment tableEnv = TableEnvironment.create(settings);
-
         Table table = tableEnv.fromValues(
                 DataTypes.ROW(
                         DataTypes.FIELD("id", DataTypes.INT()),
@@ -26,19 +25,15 @@ public class AvgAggregateFunctionApp {
                 Row.of(2, "M", 100),
                 Row.of(3, "F", 99)
         );
-
         tableEnv.createTemporaryView("t", table);
         tableEnv.createTemporaryFunction("pk_avg", PKAvgFunction.class);
-
         tableEnv.executeSql("select gender, pk_avg(score) avg_score from t group by gender").print();
     }
-
 
     /**
      * 求平均数： 总数  / 个数
      */
     public static class PKAvgFunction extends AggregateFunction<Double, PKAvgAccumulator> {
-
         @Override
         public Double getValue(PKAvgAccumulator accumulator) {
             return accumulator.sum / accumulator.count;
@@ -56,14 +51,10 @@ public class AvgAggregateFunctionApp {
             acc.count = acc.count + 1;
             acc.sum = acc.sum + score;
         }
-
-
     }
-
 
     public static class PKAvgAccumulator {
         public double sum = 0;
         public int count = 0;
     }
-
 }
