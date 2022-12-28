@@ -2,9 +2,9 @@ package com.pk.kafka.producer;
 
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Properties;
 
@@ -16,7 +16,7 @@ public class KafkaProducerApp03 {
     public static String TOPIC = "pk-2-2";
     KafkaProducer<String, String> kafkaProducer;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Properties properties = new Properties();
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BROKERS);
@@ -44,7 +44,7 @@ public class KafkaProducerApp03 {
     /**
      * 完成最后的资源释放操作
      */
-    @After
+    @AfterEach
     public void tearDown() {
         if (null != kafkaProducer) {
             kafkaProducer.close();

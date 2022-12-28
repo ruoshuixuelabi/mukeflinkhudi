@@ -3,9 +3,9 @@ package com.pk.kafka.consumer;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.*;
@@ -29,7 +29,7 @@ public class KafkaConsumerApp02 {
     public static final String GROUP = "pk-test-group";
     KafkaConsumer<String, String> kafkaConsumer;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Properties properties = new Properties();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BROKERS);
@@ -94,7 +94,7 @@ public class KafkaConsumerApp02 {
         }
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (null != kafkaConsumer) {
             kafkaConsumer.close();

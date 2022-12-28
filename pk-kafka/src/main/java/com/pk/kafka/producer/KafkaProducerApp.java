@@ -2,9 +2,9 @@ package com.pk.kafka.producer;
 
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Properties;
 
@@ -19,14 +19,14 @@ import java.util.Properties;
  * 记住入口：KafkaProducer
  */
 public class KafkaProducerApp {
-    public static String BROKERS = "hadoop000:9093,hadoop000:9094";
+    public static String BROKERS = "172.18.30.88:9092";
     public static String TOPIC = "pk-1-1";
     KafkaProducer<String, String> kafkaProducer;
 
     /**
      * 完成初始化的构造操作
      */
-    @Before
+    @BeforeEach
     public void setUp() {
         Properties properties = new Properties();
         // 连接到Kafka集群
@@ -95,7 +95,7 @@ public class KafkaProducerApp {
     /**
      * 完成最后的资源释放操作
      */
-    @After
+    @AfterEach
     public void tearDown() {
         if (null != kafkaProducer) {
             kafkaProducer.close();

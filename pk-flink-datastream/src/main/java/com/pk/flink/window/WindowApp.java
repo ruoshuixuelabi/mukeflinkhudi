@@ -43,6 +43,7 @@ public class WindowApp {
 
     /**
      * 滚动窗口的设置
+     *
      * @param env
      */
     public static void tumblingWindow(StreamExecutionEnvironment env) {
@@ -51,7 +52,7 @@ public class WindowApp {
 //        SingleOutputStreamOperator<Integer> source = env.socketTextStream("localhost", 9527)
 //                .map(x -> Integer.parseInt(x.trim()));
 //        source.windowAll(TumblingProcessingTimeWindows.of(Time.seconds(5))) // 5秒一个窗口
-//        .sum(0)
+//                .sum(0)
 //                .print();
         SingleOutputStreamOperator<Tuple2<String, Integer>> source = env.socketTextStream("localhost", 9527)
                 .map(x -> {

@@ -9,7 +9,9 @@ import java.util.Map;
  * 自定义分区器：
  * <p>
  * Producer发送消息到Kafka时，根据消息的内容进行分区
+ * <p>
  * PK  ==>   0
+ * <p>
  * RUOZE  ==> 1
  */
 public class PKPartitioner implements Partitioner {

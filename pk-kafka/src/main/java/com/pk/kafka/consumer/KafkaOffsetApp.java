@@ -2,7 +2,6 @@ package com.pk.kafka.consumer;
 
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.junit.Before;
 
 import java.time.Duration;
 import java.util.Arrays;

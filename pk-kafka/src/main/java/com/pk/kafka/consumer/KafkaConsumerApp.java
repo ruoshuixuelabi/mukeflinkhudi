@@ -1,12 +1,11 @@
 package com.pk.kafka.consumer;
 
 import org.apache.kafka.clients.consumer.*;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ public class KafkaConsumerApp {
     public static final String GROUP = "pk-test-group";
     KafkaConsumer<String, String> kafkaConsumer;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Properties properties = new Properties();
         // 连接到Kafka集群
@@ -136,7 +135,7 @@ public class KafkaConsumerApp {
         }
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (null != kafkaConsumer) {
             kafkaConsumer.close();
