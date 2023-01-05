@@ -5,9 +5,8 @@ import org.apache.flink.util.Collector;
 
 public class PKFlatMapFunction implements FlatMapFunction<String, String> {
     /**
-     *
      * @param value The input value. 其实就是step1中读取到的文件内容的一行行的数据
-     * @param out The collector for returning result values.
+     * @param out   The collector for returning result values.
      * @throws Exception
      */
     @Override
