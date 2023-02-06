@@ -20,6 +20,10 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-runtime-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-files</artifactId>
+        </dependency>
         <!-- 日志相关的依赖 -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
