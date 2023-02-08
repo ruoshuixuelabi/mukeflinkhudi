@@ -28,16 +28,16 @@ public class FlinkTopAnalysisApp {
         /*
          * 接入的数据是json格式 ==> Access
          */
-        SingleOutputStreamOperator<Tuple3<String, String, Long>> resultStream = source.map(json -> JSON.parseObject(json, Access.class))
+        SingleOutputStreamOperator<Tuple3<String, String, Long>> resultStream = source
+                .map(json -> JSON.parseObject(json, Access.class))
                 .map(x -> Tuple3.of(x.getName(), DateUtils.ts2Date(x.getTs(), "yyyyMMdd"), 1L))
                 .returns(Types.TUPLE(Types.STRING, Types.STRING, Types.LONG))
                 .keyBy(x -> x.f0)
                 .sum(2);
-        resultStream.print();
         // step3: 将结果输出到目的地
         FlinkJedisPoolConfig conf = new FlinkJedisPoolConfig.Builder()
-                .setHost("hadoop000")  // 指向部署redis的hostname或者是ip
-                .setPort(16379)  // 指向的是redis的端口  默认是6379，默认端口在云主机上容易被挖矿
+                .setHost("172.18.30.88")  // 指向部署redis的hostname或者是ip
+                .setPort(6379)  // 指向的是redis的端口  默认是6379，默认端口在云主机上容易被挖矿
                 .setDatabase(6)  // 指向结果写入到redis中的第几个数据库
                 .build();
         resultStream.addSink(new RedisSink<Tuple3<String, String, Long>>(conf, new RedisExampleMapper()));

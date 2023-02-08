@@ -18,8 +18,10 @@ public class FlinkTopAnalysisAppV2 {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         // step1: 接入要处理的数据源
+//        DataStreamSource<String> source = env.readTextFile("data/productaccess.log");
         FileSource<String> fileSource = FileSource.forRecordStreamFormat(new TextLineInputFormat(), new Path("data/productaccess.log")).build();
         DataStreamSource<String> source = env.fromSource(fileSource, WatermarkStrategy.noWatermarks(), "file-source");
+
         // step2: 使用Flink Transformation算子进行各种维度的统计分析
         /*
          * 接入的数据是json格式 ==> Access
