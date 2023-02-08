@@ -60,7 +60,7 @@ public class TransformationApp {
 //        FileSource<String> fileSource = FileSource.forRecordStreamFormat(new TextLineInputFormat(), new Path("data/access.log")).build();
 //        DataStreamSource<String> source = env.fromSource(fileSource, WatermarkStrategy.noWatermarks(), "file-source");
 //        source.map(new AccessConvertFunction())
-//                .keyBy(Access::getDomain).sum("traffic")
+//                .keyBy(Access::getDomain).sum("traffic")//按照getDomain进行分组，然后求traffic的和
 //                .print();
         /*
          * union：合并多个流

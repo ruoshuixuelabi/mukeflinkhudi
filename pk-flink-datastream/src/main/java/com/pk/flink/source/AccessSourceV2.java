@@ -8,6 +8,7 @@ import java.util.Random;
 
 /**
  * 自定义数据源
+ * 多并行度的
  */
 public class AccessSourceV2 implements ParallelSourceFunction<Access> {
     boolean isRunning = true;

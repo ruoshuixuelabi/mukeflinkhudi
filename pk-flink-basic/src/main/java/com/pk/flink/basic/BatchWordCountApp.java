@@ -18,7 +18,7 @@ public class BatchWordCountApp {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         // step1: 读取文件内容  ==> 一行一行的字符串而已
         DataSource<String> source = env.readTextFile("data/wc.data");
-        // step2: 每一行的内容按照指定的分隔符进行拆分  1:N
+        // step2: 每一行的内容按照指定的分隔符进行拆分  1:N 的关系
         source.flatMap(new PKFlatMapFunction())
                 .map(new MapFunction<String, Tuple2<String, Integer>>() {
                     @Override
