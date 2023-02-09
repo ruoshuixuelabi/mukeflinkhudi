@@ -24,15 +24,12 @@ import java.util.Map;
 public class FlinkKafkaETLApp {
 
     public static void main(String[] args) throws Exception {
-
         // localhost:8081
         Configuration configuration = new Configuration();
         configuration.setInteger("rest.port", 8081);
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(configuration);
-
         String brokers = "hadoop000:9093,hadoop000:9094,hadoop000:9095";
         String topic = "test11";
-
         KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(topic)
@@ -40,20 +37,13 @@ public class FlinkKafkaETLApp {
                 .setStartingOffsets(OffsetsInitializer.latest())
                 .setValueOnlyDeserializer(new SimpleStringSchema())
                 .build();
-
-
-
-
         // 已经对接上Kafka
         DataStreamSource<String> source = env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "PK-KAFKA-SOURCE");
-
         // 假设只有id，需要根据id讲mysql中的名称补齐
         source.map(json -> JSON.parseObject(json, Access.class))
                 .map(new RichMapFunction<Access, Access>() {
-
                     Connection connection = null;
                     PreparedStatement pstmt = null;
-
                     Map<Integer, String> courseMap = new HashMap<>();
 
                     @Override
@@ -61,7 +51,7 @@ public class FlinkKafkaETLApp {
                         connection = MySQLUtils.getConnection();
                         pstmt = connection.prepareStatement("select * from course");
                         ResultSet rs = pstmt.executeQuery();
-                        while(rs.next()) {
+                        while (rs.next()) {
                             courseMap.put(rs.getInt("id"), rs.getString("name"));
                         }
                     }
@@ -78,7 +68,6 @@ public class FlinkKafkaETLApp {
                         MySQLUtils.close(connection);
                     }
                 }).print();
-
         env.execute("FlinkKafkaETLApp");
     }
 }

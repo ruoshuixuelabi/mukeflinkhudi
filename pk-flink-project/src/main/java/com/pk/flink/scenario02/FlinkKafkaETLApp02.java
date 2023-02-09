@@ -12,26 +12,18 @@ import java.util.concurrent.TimeUnit;
  * 使用Flink异步IO的操作
  */
 public class FlinkKafkaETLApp02 {
-
     public static void main(String[] args) throws Exception {
-
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
-
         // 1  2  3  4  5
         DataStreamSource<String> lines = env.socketTextStream("hadoop000", 9527);
-
         int capacity = 20;
-
         SingleOutputStreamOperator<Tuple2<String, String>> result = AsyncDataStream.orderedWait(lines,
                 new MySQLAsyncFunction(capacity),
                 3000,
                 TimeUnit.MILLISECONDS,
                 capacity
         );
-
         result.print();
-
         env.execute("FlinkKafkaETLApp");
     }
 }

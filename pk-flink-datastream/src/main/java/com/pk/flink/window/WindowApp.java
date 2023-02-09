@@ -18,6 +18,10 @@ public class WindowApp {
         env.execute();
     }
 
+    /**
+     * session 窗口 的测试
+     * @param env
+     */
     public static void sessionWindow(StreamExecutionEnvironment env) {
         SingleOutputStreamOperator<Integer> source = env.socketTextStream("localhost", 9527)
                 .map(x -> Integer.parseInt(x.trim()));
@@ -26,6 +30,10 @@ public class WindowApp {
                 .print();
     }
 
+    /**
+     * 滑动窗口的测试
+     * @param env
+     */
     public static void slidingWindow(StreamExecutionEnvironment env) {
         SingleOutputStreamOperator<Integer> source = env.socketTextStream("localhost", 9527)
                 .map(x -> Integer.parseInt(x.trim()));
@@ -84,6 +92,7 @@ public class WindowApp {
                     String[] splits = x.split(",");
                     return Tuple2.of(splits[0].trim(), Integer.parseInt(splits[1].trim()));
                 }).returns(Types.TUPLE(Types.STRING, Types.INT));
+        //需要注意分组和不分组的区别，分组之后需要那一组达到5个才会计算，不分组的情况下一共5个就会计算
         source.keyBy(x -> x.f0) // 先分组
                 .countWindow(5) // 5个元素一个窗口
                 .sum(1)

@@ -26,25 +26,18 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
  * 在工作中有一个"潜"规则: 当一段代码在多个代码中有重复， 就得想着我是不是该把代码重构下
  */
 public class EOSApp01 {
-
     public static void main(String[] args) throws Exception {
-
         DataStream<String> stream = FlinkUtils.createStream(args, SimpleStringSchema.class);
         // TODO... 完成业务逻辑开发
-
         stream.print();
-
         FlinkUtils.environment.execute("EOSApp01");
     }
-
     public static void test01() throws Exception {
         StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
-
         // 1 硬编码   ==> 通过配置文件
         String brokers = "hadoop000:9093,hadoop000:9094,hadoop000:9095";
         String topic = "pkflink";
         String group = "pkgroup";
-
         // 2 对接Kafka数据源 代码重复问题
         KafkaSource<String> source = KafkaSource.<String>builder()
                 .setBootstrapServers(brokers)
@@ -54,17 +47,9 @@ public class EOSApp01 {
                 .setStartingOffsets(OffsetsInitializer.latest())
                 .setValueOnlyDeserializer(new SimpleStringSchema())
                 .build();
-
         DataStreamSource<String> stream = environment.fromSource(source, WatermarkStrategy.noWatermarks(), "pk-kafka-source");
-
         // TODO... 完成业务逻辑开发
-
         stream.print();
-
-
         environment.execute("EOSApp01");
     }
-
-
-
 }

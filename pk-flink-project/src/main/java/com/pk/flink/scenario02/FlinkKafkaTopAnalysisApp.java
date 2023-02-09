@@ -21,17 +21,13 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  * 对接Kafka数据然后使用Flink进行实时统计分析
  */
 public class FlinkKafkaTopAnalysisApp {
-
     public static void main(String[] args) throws Exception {
-
         // localhost:8081
         Configuration configuration = new Configuration();
         configuration.setInteger("rest.port", 8081);
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(configuration);
-
         String brokers = "hadoop000:9093,hadoop000:9094,hadoop000:9095";
         String topic = "test11";
-
         KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(topic)
@@ -39,9 +35,7 @@ public class FlinkKafkaTopAnalysisApp {
                 .setStartingOffsets(OffsetsInitializer.latest())
                 .setValueOnlyDeserializer(new SimpleStringSchema())
                 .build();
-
         DataStreamSource<String> source = env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "PK-KAFKA-SOURCE");
-
         SingleOutputStreamOperator<Tuple3<String, String, Long>> resultStream = source.map(new MapFunction<String, Access>() {
             @Override
             public Access map(String value) throws Exception {
@@ -64,9 +58,7 @@ public class FlinkKafkaTopAnalysisApp {
                         return Tuple3.of("pk-access-"+value.f1, value.f0, value.f2);
                     }
                 });
-
         resultStream.addSink(new PKRedisSink());
-
         env.execute("FlinkKafkaTopAnalysisApp");
     }
 }
