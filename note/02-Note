@@ -1,0 +1,64 @@
+
+快速上手
+	体验一把  爽一把
+
+使用官方提供的mvn命令来创建工程
+mvn archetype:generate \
+-DarchetypeGroupId=org.apache.flink \
+-DarchetypeArtifactId=flink-walkthrough-datastream-java \
+-DarchetypeVersion=1.15.0 \
+-DgroupId=frauddetection \
+-DartifactId=frauddetection \
+-Dversion=0.1 \
+-Dpackage=spendreport \
+-DinteractiveMode=false
+
+
+mvn archetype:generate                \
+-DarchetypeGroupId=org.apache.flink   \
+-DarchetypeArtifactId=flink-quickstart-java \
+-DarchetypeVersion=1.15.0
+
+
+
+数据文件的内容如下：wc.data
+pk,pk,pk
+ruoze,ruoze
+hello
+
+需求：统计每个单词出现的次数
+	wc统计：词频统计
+
+	批处理：离线处理
+	实时处理：流处理   
+
+当你们拿到一个需求时，不要先想着用代码如何实现，而应该是先把思路理清，然后就是把思路转换成代码来落地和实现
+step0: Spark中有上下文，Flink中也有上下文，MR中也有
+step1: 读取文件内容  ==> 一行一行的字符串而已
+step2: 每一行的内容按照指定的分隔符进行拆分
+		按照逗号进行拆分   split(",") ==> String[]
+		pk,pk,pk  
+			==>  
+			String[]: pk pk pk   
+step3: (pk, 1) (pk, 1)  (pk, 1)
+step4: 按照单词进行分组 ==> 求词频 sum
+		(pk, 1) (pk, 1)  (pk, 1) 
+		(ruoze, 1) (ruoze, 1)
+		(hello, 1)
+
+
+实时vs离线出来的结果的差异性
+	离线：结果是一次性出来的
+	实时：来一个数据处理一次，所以是带状态/state的，
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,57 @@
+
+{"ts":"1669475855000","type":"交友","userid":"user4","province":"QH"}
+
+
+
+create table stat_result(
+`ts` timstamp,
+catagory varchar(50),
+province  varchar(50),
+`cnt` int(11),
+primary key(`ts`,catagory, province)
+) ;
+
+
+https://edp963.github.io/davinci/
+
+
+
+下载
+解压到~/app/davinci
+添加到系统环境变量
+	export DAVINCI3_HOME=/home/hadoop/app/davinci
+	export PATH=$DAVINCI3_HOME/bin:$PATH
+配置文件: application.yml
+
+
+到mysql中创建一个davinci数据库，将davinci.sql导入到davinci数据库中
+	
+
+server:
+  protocol: http
+  address: hadoop000    部署的机器的hostname或者是ip
+  port: 8887            暴露出来的Web服务的端口
+
+
+datasource:
+  url: jdbc:mysql://hadoop000:13306/davinci?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true
+  username: 'root'
+  password: '000000'
+
+
+mail:
+    host: smtp.qq.com
+    port: 25
+    username: 1990218038@qq.com
+    fromAddress:
+    password: 
+    nickname: PK
+
+password：这个密码是一个特殊密码
+
+
+
+qq邮箱 / 邮箱设置  / 账户  / POP3/SMTP服务   开启  ==> 授权码
+
+
+

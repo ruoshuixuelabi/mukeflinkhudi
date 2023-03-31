@@ -1,0 +1,393 @@
+catalog
+
+
+Hive/Spark SQL：  database  table 
+Flink： catalog  database  table
+
+
+对Hudi的版本进行一次升级
+0.12系列
+
+Hudi是作为数据湖框架，对于在生产上来说，其实就是使用相关的jar
+
+Hudi要整合Flink：把Hudi相关的jar放到$FLINK_HOME/lib下
+	hudi-flink1.15-bundle-0.13.0.jar
+依次类推，如果要整合Spark、Hive，也是一样的操作
+
+
+Flink要整合Kafka、MySQL、Hive    mvn仓库
+	flink-sql-connector-hive-3.1.2_2.12-1.15.0.jar
+	flink-sql-connector-kafka-1.15.0.jar
+	flink-sql-connector-mysql-cdc-2.2.1.jar
+
+Hudi要整合Hive：
+	hudi-hadoop-mr-bundle-0.13.0.jar
+	hudi-hive-sync-bundle-0.13.0.jar
+
+
+你放了这些包进去之后，记得要重启下你的hive的metastore
+
+flink-conf.yaml
+	taskmanager.numberOfTaskSlots: 8
+
+
+
+将我们的操作如何整合到hive catalog里面去呢？
+	在终端创建了表，就是要将元数据信息统一纳管到hive catalog中去
+
+
+CREATE CATALOG hive_catalog WITH (
+  'type' = 'hive',
+  'default-database' = 'pk',
+  'hive-conf-dir' = '/home/hadoop/app/hive/conf',
+  'hadoop-conf-dir' = '/home/hadoop/app/hadoop/etc/hadoop'
+);
+
+
+
+准备工作就绪 
+
+一整套的解决思路
+
+
+MySQL --> CDC --> 
+
+分层：
+	CDC：MySQL数据使用cdc方式接入    hudi_cdc
+	ODS：分区表                     hudi_ods  hive_ods
+	DWD：聚合						   hudi_dwd  hive_dwd
+	DWS(不一定有)
+	ADS：输出结果                    hudi_ads  hive_ads
+
+	CDC --> ODS --> DWD --> ADS
+	ODS --> DWD --> DWS --> ADS
+
+
+drop database if exists hive_ods cascade;
+drop database if exists hive_dwd cascade;
+drop database if exists hive_ads cascade;
+
+create database hudi_cdc;
+create database hudi_ods;
+create database hudi_dwd;
+create database hudi_ads;
+
+
+
+CREATE TABLE hudi_cdc.cdc_sku (
+ id INT primary key,
+ name STRING,
+ catagory int,
+ price double
+) WITH (
+ 'connector' = 'mysql-cdc',
+ 'hostname' = 'hadoop000',
+ 'port' = '13306',
+ 'username' = 'root',
+ 'password' = '000000',
+ 'server-time-zone' = 'UTC',
+ 'database-name' = 'pk_cdc',
+ 'table-name' = 'dim_sku'
+);
+
+
+CREATE TABLE hudi_cdc.cdc_order_info (
+ id string primary key,
+ amt double,
+ address string,
+ ts bigint,
+ status int,
+ province_id string,
+ user_id string
+) WITH (
+ 'connector' = 'mysql-cdc',
+ 'hostname' = 'hadoop000',
+ 'port' = '13306',
+ 'username' = 'root',
+ 'password' = '000000',
+ 'server-time-zone' = 'UTC',
+ 'database-name' = 'pk_cdc',
+ 'table-name' = 'order_info'
+);
+
+
+CREATE TABLE hudi_cdc.cdc_order_detail_info (
+ id string primary key,
+ order_id string,
+ sku_id int,
+ sku_name string,
+ sku_num int,
+ sku_price double,
+ sku_amt double
+) WITH (
+ 'connector' = 'mysql-cdc',
+ 'hostname' = 'hadoop000',
+ 'port' = '13306',
+ 'username' = 'root',
+ 'password' = '000000',
+ 'server-time-zone' = 'UTC',
+ 'database-name' = 'pk_cdc',
+ 'table-name' = 'order_detail_info'
+);
+
+
+写一段代码产生数据，输出到MySQL表
+
+事先约定好数据字段  
+
+订单：
+	订单ID：yyyyMMddHHmmssSSS
+	ts: System.currentTimeMillis()
+	userId: Map<userId, userName> users
+	provinceId： Map<String,String> provinces
+	伪代码：
+		造100个订单
+		Thread.sleep(1000)
+
+订单详情：
+	id：UUID
+	订单ID：orderInfo.getId
+	sku_id: 
+	sku_name:
+	sku_num:
+	sku_price:
+		Tuple4<Integer, String, Integer, Double >
+	sku_amt: sku_price * sku_num
+
+
+Java/Scala/Python ==> save mysql中的订单和订单详情表中
+
+
+hudi_ods层建设
+
+create table hudi_ods.ods_order_info(
+id string,
+amt double,
+address string,
+ts bigint,
+status int,
+province_id string,
+user_id string,
+dt string
+)
+partitioned by (dt)
+with(
+'connector'='hudi',
+'path' = 'hdfs://hadoop000:8020/user/hudi/warehouse/hudi_ods/ods_order_info',
+'table.type' = 'MERGE_ON_READ',
+'hoodie.datasource.write.recordkey.field'='id',
+'hoodie.datasource.write.precombine.field'='ts',
+'write.tasks'='1',
+'compaction.tasks'='1',
+'compaction.async.enabled'='true',
+'read.streaming.enabled'='true',
+'compaction.trigger.strategy'='num_commits',
+'compaction.delta_commits'='1',
+'hive_sync.enabled'='true',
+'hive_sync.db'='hive_ods',
+'hive_sync.metastore.uris'='thrift://hadoop000:9083',
+'hive_sync.table'='ods_order_info'
+);
+
+-- 将cdc的数据落入到ods
+insert into hudi_ods.ods_order_info
+select 
+*, date_format(from_utc_timestamp(ts, 'GMT+8'),'yyyy-MM-dd') dt
+from hudi_cdc.cdc_order_info;
+
+
+create table hudi_ods.ods_sku(
+id INT,
+name STRING,
+catagory int,
+price double,
+ts timestamp(3)
+)
+with(
+'connector'='hudi',
+'path' = 'hdfs://hadoop000:8020/user/hudi/warehouse/hudi_ods/ods_sku',
+'table.type' = 'MERGE_ON_READ',
+'hoodie.datasource.write.recordkey.field'='id',
+'hoodie.datasource.write.precombine.field'='ts',
+'write.tasks'='1',
+'compaction.tasks'='1',
+'compaction.async.enabled'='true',
+'read.streaming.enabled'='true',
+'compaction.trigger.strategy'='num_commits',
+'compaction.delta_commits'='1',
+'hive_sync.enabled'='true',
+'hive_sync.db'='hive_ods',
+'hive_sync.metastore.uris'='thrift://hadoop000:9083',
+'hive_sync.table'='ods_sku'
+);
+
+-- 将cdc的数据落入到ods
+insert into hudi_ods.ods_sku
+select 
+*, localtimestamp as ts
+from hudi_cdc.cdc_sku;
+
+
+create table hudi_ods.ods_order_detail_info(
+id string,
+order_id string,
+sku_id int,
+sku_name string,
+sku_num int,
+sku_price double,
+sku_amt double,
+ts timestamp(3),
+dt string
+)
+partitioned by (dt)
+with(
+'connector'='hudi',
+'path' = 'hdfs://hadoop000:8020/user/hudi/warehouse/hudi_ods/ods_order_detail_info',
+'table.type' = 'MERGE_ON_READ',
+'hoodie.datasource.write.recordkey.field'='id',
+'hoodie.datasource.write.precombine.field'='ts',
+'write.tasks'='1',
+'compaction.tasks'='1',
+'compaction.async.enabled'='true',
+'read.streaming.enabled'='true',
+'compaction.trigger.strategy'='num_commits',
+'compaction.delta_commits'='1',
+'hive_sync.enabled'='true',
+'hive_sync.db'='hive_ods',
+'hive_sync.metastore.uris'='thrift://hadoop000:9083',
+'hive_sync.table'='ods_order_detail_info'
+);
+
+-- 将cdc的数据落入到ods
+insert into hudi_ods.ods_order_detail_info
+select 
+*, 
+localtimestamp as ts,
+date_format(from_utc_timestamp(localtimestamp, 'GMT+8'),'yyyy-MM-dd') dt
+from hudi_cdc.cdc_order_detail_info;
+
+
+DWD建设
+	CDC --> ODS --> DWD --> ADS
+	ODS --> DWD --> DWS --> ADS
+
+CDC：
+	对接MySQL中的数据
+ODS：
+	没有做过多的处理，仅仅只是加了分区之类，
+	落到Hudi以及Hive中
+	落到Hive的原因：后续方便批处理
+DWD：
+	聚合操作
+	由于前面的表都是单表
+		订单表中：user_id  province_id 
+		user_id --> user_name
+		province_id --> province_name
+		catalog_id --> catalog_name
+		user_id --> user_name
+
+	拓展：
+		根据省份维度：TopN、sku销售额、sku销售量、下单量
+		根据类别维度：TopN、销售额、销售量、下单量
+		等等...
+
+	dwd_province....
+	dwd_catalog....
+	dwd.....
+
+
+
+
+
+
+
+create table hudi_dwd.dwd_order_detail(
+id string,
+order_id string,
+sku_id int,
+sku_name string,
+sku_num int,
+sku_price double,
+sku_amt double,
+province_id string,
+user_id string,
+ts timestamp(3),
+dt string
+)
+partitioned by (dt)
+with(
+'connector'='hudi',
+'path' = 'hdfs://hadoop000:8020/user/hudi/warehouse/hudi_dwd/dwd_order_detail',
+'table.type' = 'MERGE_ON_READ',
+'hoodie.datasource.write.recordkey.field'='id',
+'hoodie.datasource.write.precombine.field'='ts',
+'write.tasks'='1',
+'compaction.tasks'='1',
+'compaction.async.enabled'='true',
+'read.streaming.enabled'='true',
+'compaction.trigger.strategy'='num_commits',
+'compaction.delta_commits'='1',
+'hive_sync.enabled'='true',
+'hive_sync.db'='hive_dwd',
+'hive_sync.metastore.uris'='thrift://hadoop000:9083',
+'hive_sync.table'='dwd_order_detail'
+);
+
+-- 将ods的数据落入到dwd
+insert into hudi_dwd.dwd_order_detail
+select 
+	od.id id, oo.id order_id,od.sku_id sku_id,od.sku_name sku_name,od.sku_num sku_num,od.sku_price sku_price,od.sku_amt sku_amt,
+	oo.province_id province_id,oo.user_id user_id,od.ts ts,od.dt dt
+from hudi_ods.ods_order_detail_info od
+join(
+	select 
+		id,user_id,province_id,amt,dt
+	from 
+		hudi_ods.ods_order_info
+) oo on od.order_id = oo.id;
+
+
+DWD是需要根据你们具体的业务逻辑来进行建设
+	“分主题”
+	主题域：订单、省份、
+		下单
+		订单变更
+
+
+ADS：指标结果写入
+	ADS肯定是从DWD来的: 对DWD进行聚合，结果写入ADS
+	ADS也是基于Hudi中构建的
+
+	BI工具去对接：如何对接Hudi呢？ 借助于Flink connector的特性
+
+
+	你在MySQL中创建一个/N个结果表  mysql_ads_xxxx   BI直接对接MySQL就行了
+		pk：dt,province_id
+
+
+更新操作：根据联合主键进行更新底层的数据表的
+
+create table hudi_ads.hudi_ads_xxxx(
+	// 一定要定义主键
+	PRIMARY KEY (dt,province_id) NOT ENFORCED
+) with(
+	'connector'='jdbc',
+	'url' = 'jdbc:mysql://localhost:3306/mydatabase',
+    'table-name' = 'mysql_ads_xxxx'
+    ....
+)
+
+
+按天，每个省份的销售额
+
+// 查询DWD的结果写入到ads
+insert into hudi_ads.xxxxxxxx
+select .... from hudi_dwd......   
+
+
+
+
+
+
+
+

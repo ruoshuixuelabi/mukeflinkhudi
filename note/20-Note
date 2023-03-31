@@ -1,0 +1,79 @@
+
+
+补充：自己来完成MySQL数据库binlog的开启工作
+mysql> show global variables like 'log_bin';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| log_bin       | ON    |
++---------------+-------+
+
+
+create user 'canal'@'%' identified by 'canal';
+grant select, replication slave, replication client on *.* to 'canal'@'%' identified by 'canal';
+flush privileges;
+
+create database canal;
+
+canal.properties
+# tcp, kafka, RocketMQ
+canal.serverMode = kafka
+canal.mq.servers = hadoop000:9093,hadoop000:9094,hadoop000:9095
+
+
+canal.instance.master.address=hadoop000:13306
+canal.instance.dbUsername=canal
+canal.instance.dbPassword=canal
+
+# mq config
+canal.mq.topic=usertopic1
+
+
+
+kafka-console-consumer.sh --bootstrap-server hadoop000:9093,hadoop000:9094,hadoop000:9095 --topic usertopic1
+
+json格式
+
+
+
+
+
+
+
+CDC： Change Data Capture 
+      变化   数据   获取
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

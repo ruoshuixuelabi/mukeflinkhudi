@@ -1,0 +1,89 @@
+Kafka Broker在ZK上的存储
+	/brokers/ids     存储的是Kafka集群中Broker对应的信息
+		1
+		2
+		3
+	/brokers/topics  存储的是Kafka集群中所使用的Topic信息
+
+
+Kafka副本问题  *****
+
+
+Kafka存储机制 *****
+
+pk-2-2： 该topic是2分区 2副本
+	pk-2-2-0   pk-2-2-0  不应该把两个相同的分区存放在一个节点上的
+	pk-2-2-1   pk-2-2-1
+
+kafka数据的存储目录：
+	log.dirs=/home/hadoop/app/tmp/kafka-logs-1
+	log.dirs=/home/hadoop/app/tmp/kafka-logs-2
+	log.dirs=/home/hadoop/app/tmp/kafka-logs-3
+
+
+
+Kafka数据存储规则
+	以partition为物理上的概念  ==> 对应一个log文件
+	Producer生产的数据会被不断的追加到log文件 末尾
+	生产的数据 可能贼大贼大的   都写到一个log中？  疯了  炸了...
+	每个partition划分为多个segment： index  log  timeindex
+
+
+[hadoop@hadoop000 kafka-logs-1]$ ls |grep pk-2-2
+pk-2-2-0
+
+	00000000000000000087.index   索引文件
+	00000000000000000087.timeindex   时间索引文件
+	partition.metadata  元数据文件
+	00000000000000000087.log   数据文件   
+	leader-epoch-checkpoint
+
+	这些文件都位于同一个文件夹下，该文件的命名规则： topic名称-分区号
+
+
+[hadoop@hadoop000 tmp]$ cd kafka-logs-2
+[hadoop@hadoop000 kafka-logs-2]$ ls |grep pk-2-2
+pk-2-2-0
+pk-2-2-1
+
+
+[hadoop@hadoop000 tmp]$ cd kafka-logs-3
+[hadoop@hadoop000 kafka-logs-3]$ ls |grep pk-2-2
+pk-2-2-1
+
+
+topic
+	partition0
+
+	partition1
+
+
+阅读：
+https://strimzi.io/blog/2021/12/17/kafka-segment-retention/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,32 @@
+ClickHouse所支持的数据类型都在system.data_type_families表中
+
+
+数值类型
+	整数
+	浮点型：对于小数点后面的位数是有严格要求的，否则数据结果准确性就有问题
+		单精度：
+		双精度：
+
+toXXX
+toTypeName
+
+select toDecimal64(2,3) x, toTypeName(x) xType, toDecimal32(1,2) y, toTypeName(y) yType, x+y z, toTypeName(z) zType;	
+
+	decimal
+
+
+create table datatype_tuple(
+t Tuple(Int8, String,Array(String),Array(Int8))
+) engine=Memory;
+
+
+
+create table datatype_int(
+id  Int8,
+age UInt8,
+info Int32
+)engine=Memory;
+
+
+
+

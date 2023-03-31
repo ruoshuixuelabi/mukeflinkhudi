@@ -1,0 +1,40 @@
+Flink程序编程规范(类似于MR面向套路编程)
+	
+    Obtain an execution environment, 获取执行环境
+    Load/create the initial data, 加载/创建初始数据    ===> 数据接入  Source
+    Specify transformations on this data,  针对数据做处理操作  ===> 数据处理
+    Specify where to put the results of your computations, 指定计算结果输出到哪里  ===> 结果输出
+    Trigger the program execution  出发程序执行 env.execute
+
+
+DataStream表示的是Flink程序中要执行的数据集合	
+是不可变的数据集合(数据是可以重复的)
+可以是有界的，也可以是无解的
+
+
+如果内置的Source不能够满足我们的需求时，那么我们就可以自定义Source来实现：
+SourceFunction for non-parallel sources  单并行度
+or by implementing the ParallelSourceFunction interface  多并行度
+or extending the RichParallelSourceFunction for parallel sources  更牛逼的多并行度
+
+	打个预防针：Rich开头的东西，都是比较猛，增强的
+
+Flink对接socket的方法底层实现：
+public DataStreamSource<String> socketTextStream(
+            String hostname, int port, String delimiter, long maxRetry) {
+    return addSource(
+                new SocketTextStreamFunction(hostname, port, delimiter, maxRetry), "Socket Stream");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

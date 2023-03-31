@@ -1,0 +1,59 @@
+Flink起源
+	Flink起源于Stratosphere项目，
+	Stratosphere是在2010~2014年由3所地处柏林的大学和欧洲的一些其他的大学共同进行的研究项目，
+	2014年4月Stratosphere的代码捐赠给了Apache软件基金会， 
+	参加这个孵化项目的初始成员是Stratosphere系统的核心开发人员，
+	2014年12月，Flink一跃成为 Apache 软件基金会的顶级项目
+    2019年1月，阿里收购了， Blink版本， 8月份Flink1.9.0进行了合并
+
+
+
+
+
+
+
+
+Flink具备的特性
+	Exactly-once state consistency
+	Event-time processing & Sophisticated late data handling
+	Deploy Applications：YARN K8S Standalone
+	Connectors
+	checkpointing&Savepoints
+	-----------
+	Low latency、High throughput
+	High-availability
+
+
+
+
+Flink vs Spark
+	一栈式解决各种不同场景的问题
+	批计算、流计算、机器学习等等
+
+	Flink以流/实时作为出发点，批计算是作为实时计算的特例
+		DataStream 
+		DataFlow
+	Spark以批计算作为出发点，实时计算是作为批计算的特例  微批处理
+		DStream   RDD
+		DAG
+
+	如何选择？
+		业务能够接受的时间范围
+		团队的选择？ 历史问题
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -36,7 +36,6 @@ public class CustomStateApp01 {
         env.socketTextStream("localhost", 9527)
                 .map(new PKStateFunction())
                 .print();
-
         /*
          * 体现出来Flink State管理的牛逼没有
          * 定期的给我们做checkpoint
@@ -73,10 +72,8 @@ public class CustomStateApp01 {
 //                        return builder.toString();
 //                    }
 //                }).print();
-
         env.execute();
     }
-
     public static void test01(StreamExecutionEnvironment env) {
         env.socketTextStream("localhost", 9527)
                 .map(String::toLowerCase)
@@ -116,7 +113,6 @@ public class CustomStateApp01 {
                             }
                         }).start();
                     }
-
                     /*
                      * 使用了一个map来模拟了下缓存的作用，state存放在map中
                      * 该map是存放在JVM内存中的
@@ -124,7 +120,6 @@ public class CustomStateApp01 {
                      * 咋解决？
                      */
                     Map<String, Long> cache = new HashMap<>();
-
                     @Override
                     public Tuple2<String, Long> map(Tuple2<String, Long> value) throws Exception {
                         String word = value.f0;

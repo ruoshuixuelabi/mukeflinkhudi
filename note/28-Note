@@ -1,0 +1,12 @@
+
+ClickHouse编程： JDBC
+
+clickhouse-client：在终端上执行的
+但是在工作中，clickhouse是需要整合Spark、Flink等框架在一起综合使用的
+必然就要涉及到关于clickhouse编程问题：写  读
+	
+
+Hive：HS2&JDBC
+Spark：ThriftServer&JDBC
+
+<http_port>8123</http_port>

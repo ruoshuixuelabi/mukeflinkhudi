@@ -1,0 +1,143 @@
+
+表引擎 *****
+	Memory
+	TinyLog
+	MergeTree
+
+	不同引擎支持的功能是不太一样的
+	在创建表的时候需要显示的指定引擎(对应的参数)
+
+Log系列： TinyLog  StripeLog  Log
+MergeTree系列： *****
+Integration系列：Kafka MySQL ODBC/JDBC HDFS
+Special系列：Merge File...
+
+
+
+tinylog:
+	每一个字段，一个文件，文件名为字段名.bin
+	sizes.json：使用json格式记录每个bin文件对应的数据大小的信息
+	不支持mutations的操作: update delete
+
+
+stripelog:
+	data.bin：数据文件，所有的列字段使用同一个文件存储，数据都被写入到该文件中
+		id  name  age 
+	sizes.json
+	index.mrk：数据标记文件，保存了数据在data.bin中的位置信息  offset
+		可以利用数据标记来使用多线程并行的方式进行数据的读取，提升查询性能
+	不支持mutations的操作: update delete
+
+log: *****
+	每一个字段，一个文件，文件名为字段名.bin
+	sizes.json：使用json格式记录每个bin文件对应的数据大小的信息
+	__marks.mrk：利用数据标记来使用多线程并行的方式进行数据的读取，提升查询性能
+
+Log引擎：
+	一次写入，多次查询，数据量"不大"
+	tinylog: 数据不分片  每个字段一个bin文件
+	stripelog：分片  所有数据都存在一个数据文件中
+	log： 分片  每个字段一个bin文件
+
+
+
+MergeTree
+	*****
+	决定了一张表的特性：拥有什么样的特性、如何存储、如何被加载
+	高性能：列式存储、自定义分区、稀疏的主索引....
+
+
+ORDER BY expr   必填字段  分区与否 没关系  按照该字段进行排序
+	order by id      order by (id, salary)
+
+
+
+202105_1_1_0  
+	第一条数据
+	MinBlockNum = MaxBlockNum
+
+202105_2_2_0 
+	BlockNum++
+	第二条数据 
+
+202106_3_3_0
+	第三条数据
+
+202105_1_1_0   老的
+202105_2_2_0   老的
+202106_3_3_0   老的   
+
+202106_3_3_1   新的
+	3_3_0  ==> 3_3_1
+202105_1_2_1   新的
+	1_1_0  2_2_0 ==> 1_2_1
+
+202105_4_4_0 == 第四条数据
+
+
+order by是我们做去重的依据和关键所在
+ReplacingMergeTree在一定程度上解决了重复数据的问题
+ReplacingMergeTree能力还是有限的，默认情况下靠未来某个时间做merge时进行去重的操作
+
+可以带版本ver
+	没有指定：保留同一组重复数据的最后一行
+	  有指定：保留同一组重复数据中ver字段最大的那一行
+
+
+[PARTITION BY expr]
+	分区字段
+	可以是单字段，也可以是多字段
+
+
+	没有分区的话，文件名以all开头
+	有分区，如果是toYYYYMM(date)， 文件名就以YYYYMM开头
+
+[PRIMARY KEY expr]
+	主键  
+	默认主键和order 
+
+
+[SAMPLE BY expr]
+	抽样表达式
+
+[TTL expr
+    [DELETE|TO DISK 'xxx'|TO VOLUME 'xxx' [, ...] ]
+    [WHERE conditions]
+    [GROUP BY key_expr [SET v1 = aggr_func(v1) [, v2 = aggr_func(v2) ...]] ] ]
+
+[SETTINGS name=value, ...]
+	设定一些额外的参数
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

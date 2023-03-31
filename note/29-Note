@@ -1,0 +1,92 @@
+
+
+
+create table pk_product(
+id int,
+name varchar(20),
+catagory varchar(20),
+note varchar(255),
+price double,
+primary key(id)
+);
+
+
+{
+"database":"ruozedata_cdc",
+"data":{"catagory":"1",
+"note":"1",
+"price":10.1,
+"name":"1",
+"id":1},
+"type":"insert",
+"table":"pk_product"}
+
+create table pk_product(
+id UInt8,
+name String,
+catagory String,
+note String,
+price Float64
+)engine=ReplacingMergeTree()
+order by (id);
+
+
+
+用户访问行为数据：
+
+device 设备id
+deviceType： iPhone 小米  华为...
+os: 操作系统
+event： startup  cart  browse  pay
+net: WIFI 4g 5g
+channal：渠道
+uid： 用户id
+nu： 是否是新用户
+ip：
+time：
+version
+
+清洗：
+	ip ==> 省份  城市 
+	time ==> day  hour
+
+在ch表中多出来的字段： province city  day  hour  id
+
+
+topic_partition_offset
+
+
+
+create table ch_event_startup(
+id String,
+device String,
+deviceType String,
+os String,
+event String,
+net String,
+channel String,
+uid String,
+nu Nullable(UInt8),
+ip String,
+time String,
+version String,
+province Nullable(String),
+city Nullable(String),
+day  String,
+hour String,
+ts Int64
+)engine=ReplacingMergeTree()
+order by (id);
+
+
+
+
+
+
+
+
+
+
+
+
+

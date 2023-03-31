@@ -1,0 +1,109 @@
+
+
+Hadoop(MR、Hive)：离线、批处理
+	t+1
+
+Flink(DataStream, Table&SQL): 实时处理
+
+想要数据分析师 所想的 指标 快速的出来
+Kylin：根据预想的指标(先定义好)，使用预聚合的方式来计算
+
+多维度  不定的维度
+
+
+俄罗斯 Yandex  ClickHouse
+	跟踪/处理 事件/日志
+
+OLAP引擎
+
+
+
+
+
+
+ClickHouse® is a column-oriented database management system (DBMS) for online analytical processing of queries (OLAP)
+
+
+
+column-oriented：面向列式
+	ORC Parquet
+
+OLAP： On-Line Analytical Processing 联机分析处理
+	侧重点：分析、查询
+	支持复杂的分析操作
+
+	特性
+		读多于写
+			将数据批量/实时写入后，后续可以进行任意维度的灵活搜索、洞察等
+		大宽表
+			一张存在N多列的表 
+			平时使用时：可能只用到了其中的部分字段
+		数据批量/实时写入，数据很少更新
+		灵活多变，并不需要预先建模	
+		更多的是单表出来
+		事务不是必须的
+		查询结果明显小于源数据
+
+OLTP：On-Line Transcation Processing 联机事务处理
+	侧重点：事务的处理(增删改)
+	传统的关系型数据库
+
+
+
+
+列式存储：
+	stu: 50个字段  100行
+	select a1, a2, a3, a4, a5 from stu;
+	行式存储： 逐行扫描
+	列式存储： 不会发生全表scan，由于数据是按列组织的，所以只要拿所需要的字段即可。IO(磁盘、网络)大量的减少
+			由于每一列都有明确相同的数据类型，使用压缩以后，压缩比会比较高
+
+
+conf 
+	/etc/clickhouse-server
+		config.xml
+			<path>/var/lib/clickhouse/</path>
+
+lib 
+	/var/lib/clickhouse
+					   /data       数据 
+					   		/pktest      数据库名
+					   			   /user  表名
+					   			   		/数据
+					   /metadata   元数据
+					   		    /pktest
+					   		    	user.sql 表的语句
+					   		    pktest.sql
+
+log 
+	/var/log/clickhouse-server
+
+bin
+	/usr/bin
+	 	ls |grep clickhouse
+	 	clickhouse-server 启动clickhouse服务的
+	 	clickhouse-client 客户端
+
+
+clickhouse-client的命令参数
+	--host 指向clickhouse服务的hostname/ip 
+	--port 指向clickhouse服务的端口，默认是9000
+	-m 运行输入多行SQL语法，不加-m，SQL只能写在一行
+	-q 跟上sql语句
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

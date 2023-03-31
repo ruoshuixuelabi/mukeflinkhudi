@@ -1,0 +1,71 @@
+ClickHouse元数据
+	表:tables 
+
+mergetree_partition
+
+database
+name
+engine
+is_temporary
+data_paths
+create_table_query
+partition_key
+sorting_key
+primary_key
+total_rows
+total_bytes
+
+开发一个Service  ==> JDBC连接到ClickHouse，读取到元数据就可以了
+select * from system.tables where database='table_engine' and name='mergetree_partition';
+
+
+select 
+*
+from 
+system.parts
+where
+database='table_engine' and table='mergetree_partition';
+
+列
+	columns
+
+emp: 有三列，分别是empno(UInt8)，ename和job都是String
+create table emp(
+empno UInt8,     1
+ename String,    2
+job   String     3
+)....
+
+ename empno  job
+
+
+database
+table
+name: 字段名
+type：字段类型
+position：该字段在表的第几个字段  从1开始
+
+┌─database─────┬─table───────────────┬─name─┬─type─────┬─position─┬─default_kind─┬─default_expression─┬─data_compressed_bytes─┬─data_uncompressed_bytes─┬─marks_bytes─┬─comment─┬─is_in_partition_key─┬─is_in_sorting_key─┬─is_in_primary_key─┬─is_in_sampling_key─┬─compression_codec─┬─character_octet_length─┬─numeric_precision─┬─numeric_precision_radix─┬─numeric_scale─┬─datetime_precision─┐
+│ table_engine │ mergetree_partition │ id   │ UInt8    │        1 │              │                    │                     0 │                       0 │           0 │         │                   0 │                 1 │                 1 │                  0 │                   │                   ᴺᵁᴸᴸ │                 8 │                       2 │             0 │               ᴺᵁᴸᴸ │
+│ table_engine │ mergetree_partition │ name │ String   │        2 │              │                    │                     0 │                       0 │           0 │         │                   0 │                 0 │                 0 │                  0 │                   │                   ᴺᵁᴸᴸ │              ᴺᵁᴸᴸ │                    ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │               ᴺᵁᴸᴸ │
+│ table_engine │ mergetree_partition │ date │ DateTime │        3 │              │                    │                     0 │                       0 │           0 │         │                   1 │                 0 │                 0 │                  0 │                   │                   ᴺᵁᴸᴸ │              ᴺᵁᴸᴸ │                    ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │                  0 │
+└──────────────┴─────────────────────┴──────┴──────────┴──────────┴──────────────┴────────────────────┴───────────────────────┴─────────────────────────┴─────────────┴─────────┴─────────────────────┴───────────────────┴───────────────────┴────────────────────┴───────────────────┴────────────────────────┴───────────────────┴─────────────────────────┴───────────────┴────────────────────┘
+
+┌─name─┬─type─────┬─default_type─┬─default_expression─┬─comment─┬─codec_expression─┬─ttl_expression─┐
+│ id   │ UInt8    │              │                    │         │                  │                │
+│ name │ String   │              │                    │         │                  │                │
+│ date │ DateTime │              │                    │         │                  │                │
+└──────┴──────────┴──────────────┴────────────────────┴─────────┴──────────────────┴────────────────┘
+
+
+select * from disks;
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,83 @@
+
+Table ： Input Output
+
+MR(离线处理)： InputFormat   OutputFormat
+	
+
+三段论： 输入               处理       输出
+       明确的、固定的                明确的、固定的
+       持续输入            持续处理   持续输出
+
+对于Flink来说：数据是源源不断的进来的，数据一直都在”追加“的进来的
+
+Table： 
+	select ... from xxx  group by ....
+
+动态表   vs   静态表
+
+
+
+select gender,count(1) cnt from stu group by gender;
+
+1,zs,m      ==> +m,1
+2,ls,m      ==> -m,1    +m,2
+3,ww,f      ==> f,1
+
+
+m,2
+f,1
+
+
+INSERT-only changelog stream
+仅insert
+
+
+Flink
+	catalog  数据源    hive catalog    default catalog
+		database  数据库
+			table  表
+
+
+//tableEnv.executeSql("create temporary table a....")
+tableEnv.executeSql("select .... from a....")
+
+
+
+{"id":1, "name":"PK哥", "birth":"1992-10-11 00:01:02.000", "cities":["beijing","shenzhen"], "skill":{"spark","flink"}}
+
+key和value之间 使用冒号
+key用双引号， value不一定要双引号
+{}  对象
+	对象中是否可以嵌套对象
+[]  数组
+
+[{"id":1, "name":"PK哥"},{"id":2, "name":"PK哥哥"}]
+
+
+
+{"id":1,"name":"PK哥","age":30, "gender":"M", "city":"BJ"}
+
+
+
+
+1,zs,   (AA,A,AAA)
+	1,zs,(AA,A,AAA),AA   2
+	1,zs,(AA,A,AAA),A    1
+	1,zs,(AA,A,AAA),AAA  3
+2,ls,   (888,66)
+	2,ls,888  3
+	2,ls,66   2
+
+
+
+
+
+
+
+
+
+
+
+
+
+

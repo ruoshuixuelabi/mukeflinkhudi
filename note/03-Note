@@ -1,0 +1,16 @@
+Flink是一个分布式的带有状态管理的计算框架
+	可以运行在常用/常见的集群资源管理器上
+		YARN
+		K8S  ==> 分布式计算框架Spark、Flink   云原生(Docker K8S) ***** 后期会有规划
+		Standalone
+
+
+The Flink runtime consists of two types of processes: 
+	a JobManager
+	one or more TaskManagers
+
+Hadoop：HDFS  YARN   一个老大(协调/分配) 带  1到多个小弟(干活)
+
+
+
+

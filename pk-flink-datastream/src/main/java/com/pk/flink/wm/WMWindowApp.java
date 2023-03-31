@@ -15,8 +15,11 @@ import java.time.Duration;
 
 /**
  * 数据延迟/乱序 三种
+ * <p>
  * 小：容忍度
+ * <p>
  * 中：allowedLateness
+ * <p>
  * 大：sideOutputLateData
  * <p>
  * 一起使用

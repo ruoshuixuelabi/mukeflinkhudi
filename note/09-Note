@@ -1,0 +1,115 @@
+server.properties
+	broker.id=0(*****)
+		broker的全局唯一编号，不能重复
+	num.network.threads=3
+		处理网络请求线程的数量
+	num.io.threads=8
+		处理磁盘IO的线程的数量
+	socket.send.buffer.bytes=102400
+		发送套接字的缓冲区大小
+	socket.receive.buffer.bytes=102400
+		接收套接字的缓冲区大小
+	socket.request.max.bytes=104857600
+		请求套接字的最大字节数
+	log.dirs=/home/hadoop/app/tmp/kafka-logs (*****)
+		Kafka的log file存储的目录
+	num.partitions=1
+		每个topic默认的分区数为1
+	log.retention.hours=168
+		文件保留的时间，超时将会被删除
+	zookeeper.connect=hadoop000:2181
+		连接的ZK的地址
+		先需要配置ZK，启动后，要保证zk的正常运行
+
+将KAFKA_HOME添加到系统变量中
+
+
+启动Kafka
+	kafka-server-start.sh -daemon $KAFKA_HOME/config/server.properties
+
+
+单节点单Kafka： 学习的时候用这种方式就可以了
+单节点多Kafka： 知晓多Kafka的运行方式
+生产部署：多个节点，每个节点部署一个Kafka
+		你肯定需要多个服务器（CentOS、多买几个云主机）
+
+
+
+kafka-topics.sh
+关于Kafka topic的使用：创建、删除、查看（list describe）、修改
+	Kafka和ZK是有一定的关联
+
+--bootstrap-server <String: server to    REQUIRED: The Kafka server to connect  
+  connect to>                              to. 
+  Kafka的Broker的地址：ip/hostname:port
+  为什么我们在生产上一般都是使用hostname
+  	回忆下Hadoop：ip可能会变化
+
+--create   Create a new topic.    创建topic                 
+--delete    Delete a topic        删除topic
+--describe   List details for the given topics.   查看topic的详细信息    
+--alter  Alter the number of partitions,    修改topic     
+          replica assignment, and/or           
+          configuration for the topic.         
+--list   List all available topics.    展示所有能用的topic          
+--partitions <Integer: # of partitions>  topic的分区数 
+--replication-factor   每个分区的副本数                                    
+--topic  指定topic的名字
+--config <String: name=value>   设置一些参数
+
+
+kafka-topics.sh --bootstrap-server hadoop000:9092 --create --topic test05
+kafka-topics.sh --bootstrap-server hadoop000:9092 --list
+kafka-topics.sh --bootstrap-server hadoop000:9093 --describe --topic test05
+
+定义topic时，自定义分区数以及副本数
+kafka-topics.sh --bootstrap-server hadoop000:9093 --create --partitions 3 --replication-factor 3 --topic test05
+
+Error while executing topic command : Replication factor: 2 larger than available brokers: 1
+	单节点单Kafka，说到底就是只有一个broker
+
+
+kafka-topics.sh --bootstrap-server hadoop000:9092 --alter  --topic test02 --partitions 2
+
+
+
+生产者 
+	--bootstrap-server
+	--topic
+
+	kafka-console-producer.sh --bootstrap-server hadoop000:9093,hadoop000:9094,hadoop000:9095 --topic test03
+
+消费者
+	--bootstrap-server
+	--topic
+	--from-beginning  是否从能获取到的最新数据进行消费
+
+	kafka-console-consumer.sh --bootstrap-server hadoop000:9093,hadoop000:9094,hadoop000:9095 --topic test03 --from-beginning 
+
+
+	隐含着有消费者组以及消息分发策略问题  后续讲解
+
+
+kafka-console-producer.sh --bootstrap-server hadoop000:9093,hadoop000:9094,hadoop000:9095 --topic test05
+kafka-console-consumer.sh --bootstrap-server hadoop000:9093,hadoop000:9094,hadoop000:9095 --topic test05
+
+
+
+kafka-topics.sh --bootstrap-server hadoop000:9093,hadoop000:9094,hadoop000:9095 --create --partitions 3 --replication-factor 3 --topic test05
+
+
+
+Kafka监控：http://download.kafka-eagle.org/
+
+
+hadoop000:8048
+
+
+
+
+
+
+
+
+
+

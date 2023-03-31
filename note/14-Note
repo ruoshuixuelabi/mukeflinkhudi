@@ -1,0 +1,53 @@
+Window  &  时间语义
+
+	处理时间：系统的时间
+	08:00  08:15 08:16
+	08:00  0800==>0810
+
+
+	事件时间  EventTime
+		08:00
+		08:16
+		09:00
+
+		1 2 3 4 6 7 5
+
+Watermark  水印    衡量event进展的机制，处理时是根据eventtime来的
+	由于网络的抖动 会产生数据的延迟、乱序
+	只前进 不后退
+
+	wm 10  11 12 13
+	   10  9
+
+EventTime + Window + Watermark 
+
+[window_start, window_end)
+
+Watermark >= window_end 就会触发前面的执行
+
+
+Window： 手速
+
+
+
+output.emitWatermark(new Watermark(maxTimestamp - outOfOrdernessMillis - 1));
+
+maxTimestamp：最大的时间戳
+outOfOrdernessMillis：构造器中传进来的
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
