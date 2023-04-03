@@ -14,15 +14,16 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 
 /**
  * 功能需求：使用Flink对接Kafka的数据源，完成精准一次语义
- *
+ * <p>
  * Flink + Kafka(offset)
  *   对于Flink来说，offset在State管理中完成
- *
- *
+ *<p>
  * 问题：
- * 1) 每次开发一个Flink+Kafka应用程序，你都得这么写代码， 费劲不？
- * 2) IDEA扫描发现，你的工程中是有很多的重复的代码的
+ * <li>1) 每次开发一个Flink+Kafka应用程序，你都得这么写代码， 费劲不？
+ * <li>2) IDEA扫描发现，你的工程中是有很多的重复的代码的
+ * <p>
  * ==>
+ * <p>
  * 在工作中有一个"潜"规则: 当一段代码在多个代码中有重复， 就得想着我是不是该把代码重构下
  */
 public class EOSApp01 {
