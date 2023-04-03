@@ -43,37 +43,40 @@ public class CustomStateApp01 {
          * 我们只要告诉Flink，你去从哪个位置开始接着进行代码的执行
          * 因为State Flink已经为我们周期性的做了checkpoint道某个地方去了
          */
+//        KeyedStateTest(env);
+        env.execute();
+    }
+
+    private static void KeyedStateTest(StreamExecutionEnvironment env) {
         /*
          * keyedstate来进行编程
          */
-//        env.socketTextStream("localhost", 9527)
-//                .keyBy(x -> "0")
-//                .map(new RichMapFunction<String, String>() {
-//                    ListState<String> listState;
-//
-//                    /**
-//                     * 在open方法中初始化XXXState
-//                     * 不同state是需要一个xxxxStateDescriptor(名称，类型)
-//                     */
-//                    @Override
-//                    public void open(Configuration parameters) throws Exception {
-//                        listState = getRuntimeContext().getListState(
-//                                new ListStateDescriptor("list", String.class)
-//                        );
-//                    }
-//
-//                    @Override
-//                    public String map(String value) throws Exception {
-//                        listState.add(value.toLowerCase()); // 更新操作
-//                        StringBuilder builder = new StringBuilder();
-//                        for (String s : listState.get()) {
-//                            builder.append(s);
-//                        }
-//                        return builder.toString();
-//                    }
-//                }).print();
-        env.execute();
+        env.socketTextStream("localhost", 9527)
+                .keyBy(x -> "0")
+                .map(new RichMapFunction<String, String>() {
+                    ListState<String> listState;
+                    /**
+                     * 在open方法中初始化XXXState
+                     * 不同state是需要一个xxxxStateDescriptor(名称，类型)
+                     */
+                    @Override
+                    public void open(Configuration parameters) throws Exception {
+                        listState = getRuntimeContext().getListState(
+                                new ListStateDescriptor("list", String.class)
+                        );
+                    }
+                    @Override
+                    public String map(String value) throws Exception {
+                        listState.add(value.toLowerCase()); // 更新操作
+                        StringBuilder builder = new StringBuilder();
+                        for (String s : listState.get()) {
+                            builder.append(s);
+                        }
+                        return builder.toString();
+                    }
+                }).print();
     }
+
     public static void test01(StreamExecutionEnvironment env) {
         env.socketTextStream("localhost", 9527)
                 .map(String::toLowerCase)

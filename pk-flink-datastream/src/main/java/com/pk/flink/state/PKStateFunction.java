@@ -12,7 +12,6 @@ import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction;
 public class PKStateFunction implements MapFunction<String, String>, CheckpointedFunction {
     ListState<String> listState;
     FastDateFormat format = FastDateFormat.getInstance("hh:MM:ss");
-
     @Override
     public String map(String value) throws Exception {
         System.out.println("map");

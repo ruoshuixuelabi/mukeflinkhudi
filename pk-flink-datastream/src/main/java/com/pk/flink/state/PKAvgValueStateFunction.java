@@ -12,7 +12,9 @@ import org.apache.flink.util.Collector;
 public class PKAvgValueStateFunction extends RichFlatMapFunction<Tuple2<String, Long>, Tuple2<String, Double>> {
     /**
      * Tuple2<Long, Long>
+     * <p>
      * 第一个元素 存放 个数
+     * <p>
      * 第二个元素 存放 和
      */
     private transient ValueState<Tuple2<Long, Long>> valueState;
@@ -33,7 +35,8 @@ public class PKAvgValueStateFunction extends RichFlatMapFunction<Tuple2<String, 
         Tuple2<Long, Long> current = null;
         if (null != state) {
             current = state;
-        } else {
+        }
+        else {
             current = Tuple2.of(0L, 0L);
         }
         Tuple2<Long, Long> newState = Tuple2.of(current.f0 + 1, current.f1 + value.f1);

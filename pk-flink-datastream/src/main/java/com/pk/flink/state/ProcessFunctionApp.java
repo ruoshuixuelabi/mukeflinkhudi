@@ -62,7 +62,7 @@ public class ProcessFunctionApp {
 
                     @Override
                     public void open(Configuration parameters) throws Exception {
-                        ValueStateDescriptor stateDescriptor = new ValueStateDescriptor("state", Long.class);
+                        ValueStateDescriptor<Long> stateDescriptor = new ValueStateDescriptor<>("state", Long.class);
                         valueState = getRuntimeContext().getState(stateDescriptor);
                     }
 

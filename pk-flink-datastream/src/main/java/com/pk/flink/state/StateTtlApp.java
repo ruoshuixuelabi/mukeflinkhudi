@@ -28,7 +28,8 @@ public class StateTtlApp {
                             out.collect(Tuple2.of(word.trim(), 1L));
                         }
                     }
-                }).keyBy(x -> x.f0)
+                })
+                .keyBy(x -> x.f0)
                 // keyby  过期是作用到key上    某些key时间到了过期，某些key时间没到，就不过期
                 .map(new RichMapFunction<Tuple2<String, Long>, Tuple2<String, Long>>() {
                     private transient ValueState<Long> counter = null;
@@ -40,7 +41,7 @@ public class StateTtlApp {
                                 .setStateVisibility(StateTtlConfig.StateVisibility.NeverReturnExpired)
                                 .setTtlTimeCharacteristic(StateTtlConfig.TtlTimeCharacteristic.ProcessingTime)
                                 .build();
-                        ValueStateDescriptor<Long> stateDescriptor = new ValueStateDescriptor<Long>("state", Long.class);
+                        ValueStateDescriptor<Long> stateDescriptor = new ValueStateDescriptor<>("state", Long.class);
                         stateDescriptor.enableTimeToLive(ttlConfig);
                         counter = getRuntimeContext().getState(stateDescriptor);
                     }
@@ -56,7 +57,8 @@ public class StateTtlApp {
                         counter.update(total); // 更新状态的值
                         return Tuple2.of(value.f0, total);
                     }
-                }).print();
+                })
+                .print();
         env.execute("StateTtlApp");
     }
 }
