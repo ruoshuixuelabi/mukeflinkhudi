@@ -7,7 +7,7 @@ public class ConnecterKafkaJsonApp {
     public static void main(String[] args) {
         EnvironmentSettings settings = EnvironmentSettings.newInstance().build();
         TableEnvironment tableEnv = TableEnvironment.create(settings);
-        // {"id":1, "name":"PK", "age":30, "gender":"M", "city":"BJ}
+        // {"id":1, "name":"PK", "age":30, "gender":"M", "city":"BJ"}
         /*
          * 字段：
          *      普通字段、物理字段

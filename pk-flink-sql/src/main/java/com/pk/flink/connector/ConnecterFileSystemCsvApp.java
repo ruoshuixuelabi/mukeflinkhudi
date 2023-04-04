@@ -1,7 +1,5 @@
 package com.pk.flink.connector;
-
 import org.apache.flink.table.api.*;
-
 public class ConnecterFileSystemCsvApp {
     public static void main(String[] args) {
         EnvironmentSettings settings = EnvironmentSettings.newInstance().build();
@@ -34,11 +32,11 @@ public class ConnecterFileSystemCsvApp {
                 ") with (\n" +
                 "'connector' = 'filesystem',\n" +
                 "'path' = 'data/csv/01.csv', \n" +
-                "'csv.field-delimiter' = '|', \n" +
-                "'csv.quote-character' = '$', \n" +
-                "'csv.disable-quote-character' = 'false', \n" +
-                "'csv.allow-comments' = 'true', \n" +
-                "'csv.array-element-delimiter' = ':', \n" +
+//                "'csv.field-delimiter' = '|', \n" +
+//                "'csv.quote-character' = '$', \n" +
+//                "'csv.disable-quote-character' = 'false', \n" +
+//                "'csv.allow-comments' = 'true', \n" +
+//                "'csv.array-element-delimiter' = ':', \n" +
                 "'format' = 'csv'\n" +
                 ")");
         tableEnv.executeSql("desc pk_csv2").print();

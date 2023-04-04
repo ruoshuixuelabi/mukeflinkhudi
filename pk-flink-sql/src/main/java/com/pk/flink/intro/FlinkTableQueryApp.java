@@ -32,7 +32,7 @@ public class FlinkTableQueryApp {
 //        sourceTable.groupBy($("user"))
 //                .select($("user"), $("url").count().as("cnt"))
 //                .execute().print();
-
+        //上面是使用API的方式，下面使用SQL的方式来实现同样的功能
         /*
          * createTemporaryView(name, Table)
          * createTemporaryTable(name, TableDescriptor)
