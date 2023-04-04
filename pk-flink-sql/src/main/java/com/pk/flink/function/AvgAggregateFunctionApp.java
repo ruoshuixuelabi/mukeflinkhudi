@@ -7,7 +7,6 @@ import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.types.Row;
 
-
 /**
  * 自定义UDF函数求平均数
  */

@@ -11,6 +11,12 @@ import org.apache.flink.types.Row;
 
 /**
  * TODO 该程序目前一直报错不知道原因
+ * <p>
+ * 根据排查收到升级 org.codehaus.janino 版本到3.1.9 解决了报错的问题
+ * <p>
+ * 大概率可能是
+ *<li> https://github.com/apache/flink/pull/21500
+ * <li>https://github.com/janino-compiler/janino/issues/185
  */
 public class TableFunctionApp {
     public static void main(String[] args) throws Exception {
