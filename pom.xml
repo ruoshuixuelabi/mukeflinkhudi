@@ -14,6 +14,8 @@
         <module>pk-flink-project</module>
         <module>pk-flink-sql</module>
         <module>pk-kafka</module>
+        <module>pk-canal</module>
+        <module>pk-flink-cdc</module>
     </modules>
     <!--统一管理-->
     <properties>
