@@ -6,9 +6,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 public class LiveApp {
-
     public static void main(String[] args) {
-
         Configuration configuration = new Configuration();
         configuration.setInteger("rest.port", 8082);
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(configuration);
@@ -16,9 +14,7 @@ public class LiveApp {
         env.enableCheckpointing(5000);
         env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
         // ...
-
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
-
         // 定义Source
         tableEnv.executeSql("CREATE TABLE sourceTable (\n" +
                 "ts bigint,\n" +
@@ -35,11 +31,8 @@ public class LiveApp {
                 "'scan.startup.mode' = 'latest-offset',\n" +
                 "'format' = 'json'\n" +
                 ")");
-
 //        tableEnv.executeSql("desc sourceTable").print();
 //        tableEnv.executeSql("select * from sourceTable").print();
-
-
         // 定义Sink
         tableEnv.executeSql("CREATE TABLE sinkTable (\n" +
                 "`ts` TIMESTAMP(3),\n" +
@@ -54,9 +47,7 @@ public class LiveApp {
                 "'username'='root',\n" +
                 "'password'='000000'\n" +
                 ");");
-
         // 执行SQL，将源端的数据写入到sink
         tableEnv.executeSql("insert into sinkTable select TUMBLE_START(time_ltz, INTERVAL '1' MINUTE) as ts, type as catagory, province, count(*) as cnt from sourceTable group by type,province,TUMBLE(time_ltz, INTERVAL '1' MINUTE)");
-
     }
 }
