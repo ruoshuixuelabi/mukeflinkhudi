@@ -19,7 +19,6 @@ public class ClickHouseJDBCApp {
             String ename = rs.getString("ename");
             System.out.println(empno + "==>" + ename);
         }
-
         rs.close();
         stmt.close();
         connection.close();
