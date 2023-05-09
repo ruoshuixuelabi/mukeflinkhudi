@@ -72,7 +72,7 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-jdbc</artifactId>
-            <version>${flink.version}</version>
+            <version>${flink-connector-jdbc.version}</version>
         </dependency>
         <dependency>
             <groupId>com.mysql</groupId>

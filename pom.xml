@@ -27,7 +27,8 @@
         <mybatis-plus-boot.version>3.5.2</mybatis-plus-boot.version>
         <fastjson2.version>2.0.27</fastjson2.version>
         <hutool.version>5.8.17</hutool.version>
-        <flink.version>1.16.1</flink.version>
+        <flink.version>1.17.0</flink.version>
+        <flink-connector-jdbc.version>3.1.0-1.17	</flink-connector-jdbc.version>
         <druid.version>1.2.15</druid.version>
         <flink-connector-redis.version>1.1.0</flink-connector-redis.version>
         <flink-connector-mysql-cdc.version>2.3.0</flink-connector-mysql-cdc.version>
@@ -109,7 +110,7 @@
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-connector-jdbc</artifactId>
-                <version>${flink.version}</version>
+                <version>${flink-connector-jdbc.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.hutool</groupId>
