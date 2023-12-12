@@ -6,13 +6,6 @@ Flink起源
 	2014年12月，Flink一跃成为 Apache 软件基金会的顶级项目
     2019年1月，阿里收购了， Blink版本， 8月份Flink1.9.0进行了合并
 
-
-
-
-
-
-
-
 Flink具备的特性
 	Exactly-once state consistency
 	Event-time processing & Sophisticated late data handling
@@ -22,9 +15,6 @@ Flink具备的特性
 	-----------
 	Low latency、High throughput
 	High-availability
-
-
-
 
 Flink vs Spark
 	一栈式解决各种不同场景的问题
