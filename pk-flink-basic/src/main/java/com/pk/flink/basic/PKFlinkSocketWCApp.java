@@ -1,5 +1,6 @@
 package com.pk.flink.basic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
@@ -11,6 +12,7 @@ import org.apache.flink.util.Collector;
 /**
  * 以动态传参的方式 传递Flink应用程序所需要的参数
  */
+@Slf4j
 public class PKFlinkSocketWCApp {
     public static void main(String[] args) throws Exception {
 //        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -22,7 +24,7 @@ public class PKFlinkSocketWCApp {
         String host = tool.get("host");
         int port = tool.getInt("port");
         DataStreamSource<String> source = env.socketTextStream(host, port);
-        System.out.println(source.getParallelism());
+        log.info("并行度为{}", source.getParallelism());
         // 处理
         source.flatMap((String value, Collector<Tuple2<String, Integer>> out) -> {
                     String[] splits = value.split(",");
