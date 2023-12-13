@@ -11,10 +11,10 @@ public class BatchWordCountAppV2 {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         DataSource<String> source = env.readTextFile("data/wc.data");
         /*
-         * lambda语法： (参数1，参数2，参数3...) -> {函数体}
+         * lambda语法： (参数1,参数2,参数3...) -> {函数体}
          */
 //        source.map(String::toUpperCase).print();
-        // 使用了Java泛型，由于泛型擦除的原因，需要显示的声明类型信息
+        // 使用了 Java 泛型,由于泛型擦除的原因,需要显示的声明类型信息
         source.flatMap((String value, Collector<Tuple2<String, Integer>> out) -> {
                     String[] splits = value.split(",");
                     for (String split : splits) {
