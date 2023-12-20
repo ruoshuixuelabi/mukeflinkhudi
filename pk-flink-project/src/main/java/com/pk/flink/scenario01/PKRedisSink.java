@@ -10,7 +10,7 @@ public class PKRedisSink extends RichSinkFunction<Tuple3<String, String, Long>> 
 
     @Override
     public void open(Configuration parameters) throws Exception {
-        jedis = new Jedis("172.18.30.88", 6379);
+        jedis = new Jedis("127.0.0.1", 6379);
         jedis.select(7);
     }
 

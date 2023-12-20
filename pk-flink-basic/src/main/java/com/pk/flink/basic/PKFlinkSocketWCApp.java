@@ -19,7 +19,7 @@ public class PKFlinkSocketWCApp {
         Configuration configuration = new Configuration();
         configuration.setInteger("rest.port", 8082);
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(configuration);
-        // 通过参数传递进来Flink引用程序所需要的参数
+        // 通过参数传递进来 Flink 引用程序所需要的参数
         ParameterTool tool = ParameterTool.fromArgs(args);
         String host = tool.get("host");
         int port = tool.getInt("port");
